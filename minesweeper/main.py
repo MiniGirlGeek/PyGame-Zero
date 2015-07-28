@@ -4,6 +4,7 @@
 # Imports #
 ###########
 from random import randint
+from math import floor
 
 #################
 # Graphic Setup #
@@ -33,13 +34,13 @@ tiles = {1: Actor('one'),
 #adapt these settings to suit you
 
 #defines the number of mines that will be placed in the grid
-mines = 500
+mines = 10
 
 #defines how many tiles tall the minefield is
-tall = 25
+tall = 9
 
 #defines how many tiles wide the minefield is
-wide = 41
+wide = 9
 
 ##################
 # Function Setup #
@@ -79,7 +80,7 @@ def count_mines(grid):
 
 
 base_grid = setup_empty_grid(wide, tall, 0)
-top_grid  = setup_empty_grid(wide, tall, 0)
+top_grid  = setup_empty_grid(wide, tall, 1)
 
 base_grid = populate_grid(base_grid, mines, wide, tall)
 
@@ -97,6 +98,19 @@ def draw():
             gridpos = base_grid[row][col]
             tiles[gridpos].pos = xpos, ypos
             tiles[gridpos].draw()
+    xpos, ypos = -15, -15
+    for row in range(len(top_grid)):
+        ypos += 30
+        xpos = -15
+        for col in range(len(top_grid[0])):
+            xpos += 30
+            if top_grid[row][col] == 1:
+                cover.pos = xpos, ypos
+                cover.draw()
+
+def on_mouse_down(pos):
+    top_grid[floor(pos[1]/30)][floor(pos[0]/30)] = 0
+
 
 ################
 # Screen Setup #
