@@ -34,13 +34,13 @@ tiles = {1: Actor('one'),
 #adapt these settings to suit you
 
 #defines the number of mines that will be placed in the grid
-mines = 2
+mines = 15
 
 #defines how many tiles tall the minefield is
-tall = 9
+tall = 15
 
 #defines how many tiles wide the minefield is
-wide = 9
+wide = 15
 
 ##################
 # Function Setup #
