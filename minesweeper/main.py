@@ -10,8 +10,9 @@ from math import floor
 # Graphic Setup #
 #################
 
-#imports the top tile
+#imports the top tiles
 cover = Actor('cover')
+flag  = Actor('flag')
 
 #creates a dictionary that stores all the possible bottom tile types
 tiles = {1: Actor('one'),
@@ -22,7 +23,6 @@ tiles = {1: Actor('one'),
          6: Actor('six'),
          7: Actor('seven'),
          8: Actor('eight'),
-         'flag': Actor('flag'),
          'M': Actor('mine'),
          0: Actor('blank'),
          'question': Actor('question')}
@@ -34,7 +34,7 @@ tiles = {1: Actor('one'),
 #adapt these settings to suit you
 
 #defines the number of mines that will be placed in the grid
-mines = 10
+mines = 2
 
 #defines how many tiles tall the minefield is
 tall = 9
@@ -88,7 +88,6 @@ base_grid = count_mines(base_grid)
 
 def draw():
     screen.fill((128, 0, 0))
-    global base_grid, tiles
     xpos, ypos = -15, -15
     for row in range(len(base_grid)):
         ypos += 30
@@ -107,9 +106,47 @@ def draw():
             if top_grid[row][col] == 1:
                 cover.pos = xpos, ypos
                 cover.draw()
+            elif top_grid[row][col] == 'F':
+                flag.pos = xpos, ypos
+                flag.draw()
 
-def on_mouse_down(pos):
-    top_grid[floor(pos[1]/30)][floor(pos[0]/30)] = 0
+def on_mouse_down(pos, button):
+    mousepos = (floor(pos[0]/30), floor(pos[1]/30))
+    if button == mouse.LEFT:
+        if top_grid[mousepos[1]][mousepos[0]] != 'F':
+            top_grid[mousepos[1]][mousepos[0]] = 0
+            if base_grid[mousepos[1]][mousepos[0]] == 0:
+                edge_detection((floor(pos[0]/30), floor(pos[1]/30)), base_grid)
+    else:
+        if top_grid[mousepos[1]][mousepos[0]] == 1:
+            top_grid[mousepos[1]][mousepos[0]] = 'F'
+        else:
+            top_grid[mousepos[1]][mousepos[0]] = 1
+
+def edge_detection(gridpos, grid):
+    zeros = [gridpos]
+    past_zeros = []
+    for zero in zeros:
+        top_grid[zero[1]][zero[0]] = 0
+        x, y = zero
+        neighbors = [(x - 1, y - 1), (x    , y - 1), (x + 1, y - 1),
+                     (x - 1, y    ),                 (x + 1, y    ),
+                     (x - 1, y + 1), (x    , y + 1), (x + 1, y + 1)]
+        for nx, ny in neighbors:
+            try:
+                if ny >= 0 and nx >= 0:
+                    if grid[ny][nx] == 0 and top_grid[ny][nx] == 1:
+                        if top_grid[ny][nx] != 'F':
+                            top_grid[ny][nx] = 0
+                        if (nx, ny) not in zeros:
+                            zeros.append((nx, ny))
+                    else:
+                        if top_grid[ny][nx] != 'F':
+                            top_grid[ny][nx] = 0
+
+            except:
+                pass
+    return top_grid
 
 
 ################
