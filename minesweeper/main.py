@@ -6,16 +6,13 @@
 from random import randint
 from math import floor
 
-#################
-# Graphic Setup #
-#################
-
 #imports the top tiles
 cover = Actor('cover')
 flag  = Actor('flag')
 
 #creates a dictionary that stores all the possible bottom tile types
-tiles = {1: Actor('one'),
+tiles = {0: Actor('blank'),
+         1: Actor('one'),
          2: Actor('two'),
          3: Actor('three'),
          4: Actor('four'),
@@ -23,24 +20,19 @@ tiles = {1: Actor('one'),
          6: Actor('six'),
          7: Actor('seven'),
          8: Actor('eight'),
-         'M': Actor('mine'),
-         0: Actor('blank'),
-         'question': Actor('question')}
+         'M': Actor('mine'),}
 
 ##############
 # Game Setup #
 ##############
 
-#adapt these settings to suit you
+f     = open('minefield_settings.txt')
+data  = f.readline()
+data  = data[1:-1].split(', ')
+wide  = int(data[0])
+tall  = int(data[1])
+mines = int(data[2])
 
-#defines the number of mines that will be placed in the grid
-mines = 15
-
-#defines how many tiles tall the minefield is
-tall = 15
-
-#defines how many tiles wide the minefield is
-wide = 15
 
 ##################
 # Function Setup #
@@ -78,16 +70,7 @@ def count_mines(grid):
                         pass
     return grid
 
-
-base_grid = setup_empty_grid(wide, tall, 0)
-top_grid  = setup_empty_grid(wide, tall, 1)
-
-base_grid = populate_grid(base_grid, mines, wide, tall)
-
-base_grid = count_mines(base_grid)
-
 def draw():
-    screen.fill((128, 0, 0))
     xpos, ypos = -15, -15
     for row in range(len(base_grid)):
         ypos += 30
@@ -110,6 +93,7 @@ def draw():
                 flag.pos = xpos, ypos
                 flag.draw()
 
+
 def on_mouse_down(pos, button):
     mousepos = (floor(pos[0]/30), floor(pos[1]/30))
     if button == mouse.LEFT:
@@ -120,7 +104,7 @@ def on_mouse_down(pos, button):
     else:
         if top_grid[mousepos[1]][mousepos[0]] == 1:
             top_grid[mousepos[1]][mousepos[0]] = 'F'
-        else:
+        elif top_grid[mousepos[1]][mousepos[0]] == 'F':
             top_grid[mousepos[1]][mousepos[0]] = 1
 
 def edge_detection(gridpos, grid):
@@ -148,7 +132,6 @@ def edge_detection(gridpos, grid):
                 pass
     return top_grid
 
-
 ################
 # Screen Setup #
 ################
@@ -157,3 +140,7 @@ def edge_detection(gridpos, grid):
 WIDTH = ((wide * 30) + 1) #adapts the screen size to fit the number of tiles chosen
 HEIGHT = ((tall * 30) + 1) #adapts the screen size to fit the number of tiles chosen
 
+top_grid  = setup_empty_grid(wide, tall, 1)
+base_grid = setup_empty_grid(wide, tall, 0)
+base_grid = populate_grid(base_grid, mines, wide, tall)
+base_grid = count_mines(base_grid)
