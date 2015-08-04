@@ -97,6 +97,10 @@ def draw():
             elif top_grid[row][col] == 'F':
                 flag.pos = xpos, ypos
                 flag.draw()
+    if won:
+        screen.draw.text('You Win!', center=[WIDTH/2,  HEIGHT/2], fontname="lcd_solid", fontsize=wide*6, color='yellowgreen', owidth=0.5, ocolor="black", alpha=0.6)
+    if lost:
+        screen.draw.text('You Lose!', center=[WIDTH/2,  HEIGHT/2], fontname="lcd_solid", fontsize=wide*5, color='red', owidth=0.5, ocolor="black", alpha=0.6)
 
 def check_won():
     uncovered = 0
