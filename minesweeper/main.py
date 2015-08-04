@@ -20,7 +20,9 @@ tiles = {0: Actor('blank'),
          6: Actor('six'),
          7: Actor('seven'),
          8: Actor('eight'),
-         'M': Actor('mine'),}
+         'M': Actor('mine'),
+         'R': Actor('red'),
+         'X': Actor('wrong')}
 
 ##############
 # Game Setup #
@@ -32,6 +34,9 @@ data  = data[1:-1].split(', ')
 wide  = int(data[0])
 tall  = int(data[1])
 mines = int(data[2])
+
+won = False
+lost = False
 
 
 ##################
@@ -93,19 +98,51 @@ def draw():
                 flag.pos = xpos, ypos
                 flag.draw()
 
+def check_won():
+    uncovered = 0
+    for row in range(len(top_grid)):
+        for col in range(len(top_grid[0])):
+            if top_grid[row][col] == 0:
+                uncovered += 1
+    if (wide * tall) - mines == uncovered:
+        won = True
+    else:
+        won = False
+    return won
+
+def when_lost():
+    for row in range(len(top_grid)):
+        for col in range(len(top_grid[0])):
+            if base_grid[row][col] == 'M' and top_grid[row][col] == 1:
+                top_grid[row][col] = 0
+            if top_grid[row][col] == 'F' and base_grid != 'M':
+                top_grid[row][col] = 0
+                base_grid[row][col] = 'X'
 
 def on_mouse_down(pos, button):
-    mousepos = (floor(pos[0]/30), floor(pos[1]/30))
-    if button == mouse.LEFT:
-        if top_grid[mousepos[1]][mousepos[0]] != 'F':
-            top_grid[mousepos[1]][mousepos[0]] = 0
-            if base_grid[mousepos[1]][mousepos[0]] == 0:
-                edge_detection((floor(pos[0]/30), floor(pos[1]/30)), base_grid)
+    global won, lost
+    if not won and not lost:
+        mousepos = (floor(pos[0]/30), floor(pos[1]/30))
+        if button == mouse.LEFT:
+            if base_grid[mousepos[1]][mousepos[0]] == 'M':
+                base_grid[mousepos[1]][mousepos[0]] = 'R'
+                lost = True
+                when_lost()
+            if top_grid[mousepos[1]][mousepos[0]] != 'F':
+                top_grid[mousepos[1]][mousepos[0]] = 0
+                if base_grid[mousepos[1]][mousepos[0]] == 0:
+                    edge_detection((floor(pos[0]/30), floor(pos[1]/30)), base_grid)
+        else:
+            if top_grid[mousepos[1]][mousepos[0]] == 1:
+                top_grid[mousepos[1]][mousepos[0]] = 'F'
+            elif top_grid[mousepos[1]][mousepos[0]] == 'F':
+                top_grid[mousepos[1]][mousepos[0]] = 1
+        won = check_won()
     else:
-        if top_grid[mousepos[1]][mousepos[0]] == 1:
-            top_grid[mousepos[1]][mousepos[0]] = 'F'
-        elif top_grid[mousepos[1]][mousepos[0]] == 'F':
-            top_grid[mousepos[1]][mousepos[0]] = 1
+        if won:
+            print('You Won')
+        else:
+            print('You Lost')
 
 def edge_detection(gridpos, grid):
     zeros = [gridpos]
