@@ -115,7 +115,7 @@ def when_lost():
         for col in range(len(top_grid[0])):
             if base_grid[row][col] == 'M' and top_grid[row][col] == 1:
                 top_grid[row][col] = 0
-            if top_grid[row][col] == 'F' and base_grid != 'M':
+            if top_grid[row][col] == 'F' and base_grid[row][col] != 'M':
                 top_grid[row][col] = 0
                 base_grid[row][col] = 'X'
 
